@@ -6,6 +6,10 @@ export const postMessage = async (req, res) => {
     res.status(403).send({ message: "Required parameter missing!" });
     return;
   }
+  if (req.currentUser._id === req.body.to_id) {
+    res.send({ message: "You can't send message to yourself" });
+    return;
+  }
   console.log("current user", req.currentUser);
   try {
     await Message.create({
