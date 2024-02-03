@@ -13,6 +13,9 @@ const messageSchema = new Schema(
       lowercase: true,
       unique: false,
     },
+    // isRead: {
+    //   default: false,
+    // },
     from_id: {
       type: String,
       required: true,

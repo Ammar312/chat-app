@@ -15,12 +15,28 @@ export const signupController = async (req, res) => {
 
     if (!result) {
       const passwordHash = await stringToHash(req.body.password);
-      await USER.create({
+      const user = await USER.create({
         username: req.body.username,
         email: req.body.email,
         password: passwordHash,
       });
-      res.send({ message: "Signup Successfully" });
+      const token = Jwt.sign(
+        {
+          username: user.username,
+          email: user.email,
+          _id: user._id,
+        },
+        process.env.SECRET,
+        {
+          expiresIn: "1h",
+        }
+      );
+      res.cookie("token", token, { httpOnly: true, secure: true });
+      console.log(user);
+      res.send({
+        message: "Signup Successfully",
+        data: { username: user.username, email: user.email, _id: user._id },
+      });
     } else {
       res.status(403).send({
         message: "User already exist with this email",
