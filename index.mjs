@@ -5,8 +5,9 @@ import Jwt from "jsonwebtoken";
 
 import messageRouter from "./routes/message.mjs";
 import authRouter from "./routes/auth.mjs";
+import myChatRouter from "./routes/mychat.mjs";
 import connectMongoDB from "./connectDB.mjs";
-import USER from "./models/signup.mjs";
+import USER from "./models/user.mjs";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -41,14 +42,19 @@ app.use("/api", (req, res, next) => {
   }
 });
 app.get("/api/allusers", async (req, res) => {
+  const page = Number(req.query.page) || 0;
   try {
-    const allusers = await USER.find({});
+    const allusers = await USER.find({}, { _id: 1, username: 1, email: 1 })
+      .limit(2)
+      .skip(page);
     res.send(allusers);
   } catch (error) {
+    console.log(error);
     res.send({ message: "Error in getting users" });
   }
 });
 
+app.use("/api", myChatRouter);
 app.use("/api", messageRouter);
 
 app.use("/", (req, res) => {
