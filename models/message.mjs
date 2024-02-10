@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
 const messageSchema = new Schema(
   {
@@ -21,7 +21,7 @@ const messageSchema = new Schema(
     //   required: true,
     // },
     conversationId: {
-      type: String,
+      type: Schema.Types.ObjectId,
       required: true,
     },
     from: {
@@ -29,8 +29,9 @@ const messageSchema = new Schema(
       ref: "USER",
       required: true,
     },
-    to_id: {
+    to: {
       type: Schema.Types.ObjectId,
+      ref: "USER",
       required: true,
     },
     message: {

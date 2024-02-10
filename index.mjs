@@ -42,11 +42,13 @@ app.use("/api", (req, res, next) => {
   }
 });
 app.get("/api/allusers", async (req, res) => {
-  const page = Number(req.query.page) || 0;
+  const page = Number(req.query.page) || 1;
+  const pageSize = Number(req.query.pageSize) || 2;
+  const skip = (page - 1) * pageSize;
   try {
     const allusers = await USER.find({}, { _id: 1, username: 1, email: 1 })
-      .limit(2)
-      .skip(page);
+      .skip(skip)
+      .limit(pageSize);
     res.send(allusers);
   } catch (error) {
     console.log(error);
@@ -58,7 +60,7 @@ app.use("/api", myChatRouter);
 app.use("/api", messageRouter);
 
 app.use("/", (req, res) => {
-  res.send("hello world");
+  res.send("404 Not Found");
 });
 
 app.listen(PORT, () => {

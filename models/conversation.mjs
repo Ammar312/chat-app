@@ -1,11 +1,11 @@
 import mongoose, { Schema, model } from "mongoose";
 const conversationSchema = new Schema(
   {
-    conversationId: {
-      type: String,
-      required: true,
-      unique: true,
-    },
+    // conversationId: {
+    //   type: String,
+    //   required: true,
+    //   unique: true,
+    // },
     participants: [
       {
         type: Schema.Types.ObjectId,
