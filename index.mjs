@@ -2,15 +2,24 @@ import express from "express";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
 import Jwt from "jsonwebtoken";
+import cors from "cors";
 
 import messageRouter from "./routes/message.mjs";
 import authRouter from "./routes/auth.mjs";
 import myChatRouter from "./routes/mychat.mjs";
 import connectMongoDB from "./connectDB.mjs";
 import USER from "./models/user.mjs";
+import mongoose from "mongoose";
+import responseFunc from "./utilis/response.mjs";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+app.use(
+  cors({
+    origin: ["http://localhost:5173"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 connectMongoDB(process.env.MONGO_URI);
@@ -39,6 +48,21 @@ app.use("/api", (req, res, next) => {
     console.log("errorabc", error);
     res.status(401).send({ message: "Unauthorized" });
     return;
+  }
+});
+app.get("/api/profile", async (req, res) => {
+  const { _id } = req.currentUser;
+  try {
+    const result = await USER.findOne({
+      _id: new mongoose.Types.ObjectId(_id),
+    });
+    responseFunc(res, 200, "Profile Fetched", {
+      username: result.username,
+      email: result.email,
+      _id: result._id,
+    });
+  } catch (error) {
+    console.log("profileFetchedError", error);
   }
 });
 app.get("/api/allusers", async (req, res) => {
