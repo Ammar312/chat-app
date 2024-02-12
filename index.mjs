@@ -3,6 +3,8 @@ import "dotenv/config";
 import cookieParser from "cookie-parser";
 import Jwt from "jsonwebtoken";
 import cors from "cors";
+import { Server } from "socket.io";
+import { createServer } from "http";
 
 import messageRouter from "./routes/message.mjs";
 import authRouter from "./routes/auth.mjs";
@@ -87,6 +89,26 @@ app.use("/", (req, res) => {
   res.send("404 Not Found");
 });
 
-app.listen(PORT, () => {
+const server = createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: "*",
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("New Client Connected", socket.id);
+  socket.emit("Topic 1", "somedata");
+  socket.on("disconnect", (message) => {
+    console.log("Client Disconncted", message);
+  });
+});
+setInterval(() => {
+  io.emit("Topic 1", "somedata");
+  console.log("emitting");
+}, 2000);
+
+server.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);
 });

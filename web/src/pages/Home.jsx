@@ -39,8 +39,6 @@ const Home = () => {
         </button>
       </header>
       <MyChats />
-
-      <div>{JSON.stringify(state)}</div>
     </div>
   );
 };

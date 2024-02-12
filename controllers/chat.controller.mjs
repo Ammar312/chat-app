@@ -65,7 +65,7 @@ export const getMessages = async (req, res) => {
     const result = await Message.find({
       conversationId: new mongoose.Types.ObjectId(req.body.conversationId),
     })
-      .sort({ _id: -1 })
+      // .sort({ _id: -1 })
       .skip(skip)
       .limit(pageSize)
       .populate({ path: "from", select: "username email" })
