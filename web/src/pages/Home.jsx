@@ -5,6 +5,7 @@ import { GlobalContext } from "../context/context";
 import axios from "axios";
 import { baseURL } from "../core";
 import { Link } from "react-router-dom";
+import MyChats from "../components/MyChats";
 
 const Home = () => {
   const { state, dispatch } = useContext(GlobalContext);
@@ -12,7 +13,7 @@ const Home = () => {
   const logoutHandle = async () => {
     try {
       const response = await axios.post(
-        `${baseURL}api/v1/logout`,
+        `${baseURL}api/logout`,
         {},
         {
           withCredentials: true,
@@ -28,23 +29,16 @@ const Home = () => {
   };
   return (
     <div>
-      {state.isLogin === true && state.role === "user" ? (
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-              <Link to={`/profile/${state.user._id}`}>Profile</Link>
-            </li>
-          </ul>
-        </nav>
-      ) : null}
-
-      <button
-        onClick={logoutHandle}
-        className="p-1 m-2 border-2 border-blue-400 text-blue-500 cursor-pointer"
-      >
-        Logout
-      </button>
+      <header className="w-full  px-3 py-2 bg-blue-400 text-white flex justify-between">
+        <div className="text-[36px] font-poppins">Chat App</div>
+        <button
+          onClick={logoutHandle}
+          className="p-1 m-2 border-2 border-white text-white cursor-pointer"
+        >
+          Logout
+        </button>
+      </header>
+      <MyChats />
 
       <div>{JSON.stringify(state)}</div>
     </div>

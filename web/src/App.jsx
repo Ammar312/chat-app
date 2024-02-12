@@ -6,7 +6,7 @@ import Home from "./pages/Home";
 import axios from "axios";
 import { GlobalContext } from "./context/context";
 import { baseURL } from "./core";
-import Profile from "./pages/Profile";
+import Conversation from "./pages/Conversation";
 
 const App = () => {
   const { state, dispatch } = useContext(GlobalContext);
@@ -50,8 +50,10 @@ const App = () => {
       {state.isLogin === true ? (
         <Routes>
           <Route path="/" element={<Home />} />
-          {/* <Route path="profile" element={<Profile />} /> */}
-          <Route path={`profile/:userId`} element={<Profile />} />
+          <Route
+            path={`conversation/:conversationId`}
+            element={<Conversation />}
+          />
           <Route path="*" element={<Navigate to="/" replace={true} />} />
         </Routes>
       ) : null}
@@ -59,7 +61,6 @@ const App = () => {
         <Routes>
           <Route path="signup" element={<Signup />} />
           <Route path="login" element={<Login />} />
-          <Route path={`profile/:userId`} element={<Profile />} />
           <Route path="*" element={<Navigate to="/login" replace={true} />} />
         </Routes>
       ) : null}
