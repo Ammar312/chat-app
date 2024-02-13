@@ -2,6 +2,7 @@ import Conversation from "../models/conversation.mjs";
 import Message from "../models/message.mjs";
 import mongoose from "mongoose";
 import responseFunc from "../utilis/response.mjs";
+import { io } from "../index.mjs";
 
 export const postMessage = async (req, res, next) => {
   if (!req.body.to || !req.body.message) {
@@ -29,9 +30,9 @@ export const postMessage = async (req, res, next) => {
         to: new mongoose.Types.ObjectId(req.body.to),
         message: req.body.message,
       });
+      io.emit(`${req.body.to}-${req.currentUser._id}`, message);
     } else {
       const createConversation = await Conversation.create({
-        // conversationId: `${nanoid()}`,
         participants: [senderId, recieverId],
       });
       console.log("createconversation", createConversation);
@@ -41,6 +42,7 @@ export const postMessage = async (req, res, next) => {
         to: new mongoose.Types.ObjectId(req.body.to),
         message: req.body.message,
       });
+      io.emit(`${req.body.to}-${req.currentUser._id}`, message);
     }
     console.log("checkconversaton", checkConversation);
 
@@ -66,8 +68,8 @@ export const getMessages = async (req, res) => {
       conversationId: new mongoose.Types.ObjectId(req.body.conversationId),
     })
       // .sort({ _id: -1 })
-      .skip(skip)
-      .limit(pageSize)
+      // .skip(skip)
+      // .limit(pageSize)
       .populate({ path: "from", select: "username email" })
       .populate({ path: "to", select: "username email" });
 

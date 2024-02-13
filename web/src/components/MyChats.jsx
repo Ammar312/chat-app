@@ -28,9 +28,6 @@ const MyChats = () => {
             <div
               className="border-b flex gap-4 p-2 items-center cursor-pointer"
               key={index}
-              onClick={() =>
-                navigate(`/conversation/${chat._id}`, { state: chat })
-              }
             >
               <span className="w-12 h-12 rounded-full bg-gray-200 flex items-end justify-center">
                 <FaUser className="text-white text-4xl" />
@@ -38,12 +35,17 @@ const MyChats = () => {
               {chat.participants
                 .filter((per) => per._id !== state.user._id)
                 .map((participant, index) => (
-                  <span
+                  <div
                     key={index}
-                    className="text-2xl first-letter:capitalize"
+                    className="text-2xl first-letter:capitalize w-full"
+                    onClick={() =>
+                      navigate(`/conversation/${chat._id}`, {
+                        state: participant,
+                      })
+                    }
                   >
                     {participant.username}
-                  </span>
+                  </div>
                 ))}
             </div>
           );

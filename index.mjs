@@ -5,6 +5,7 @@ import Jwt from "jsonwebtoken";
 import cors from "cors";
 import { Server } from "socket.io";
 import { createServer } from "http";
+import cookie from "cookie";
 
 import messageRouter from "./routes/message.mjs";
 import authRouter from "./routes/auth.mjs";
@@ -13,6 +14,7 @@ import connectMongoDB from "./connectDB.mjs";
 import USER from "./models/user.mjs";
 import mongoose from "mongoose";
 import responseFunc from "./utilis/response.mjs";
+import { socketUsers } from "./core.mjs";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -90,24 +92,41 @@ app.use("/", (req, res) => {
 });
 
 const server = createServer(app);
-const io = new Server(server, {
+export const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: ["*", "http://localhost:5173"],
     methods: "*",
   },
 });
-
+io.use((socket, next) => {
+  console.log("socket", socket.request.headers.cookie);
+  const parsedCookies = cookie.parse(socket.request.headers.cookie || "");
+  console.log("parsedCookies: ", parsedCookies.token);
+  try {
+    const decoded = Jwt.verify(parsedCookies.token, process.env.SECRET);
+    socketUsers[decoded._id] = socket;
+    next();
+  } catch (error) {
+    return next(new Error("Authentication error"));
+  }
+});
 io.on("connection", (socket) => {
   console.log("New Client Connected", socket.id);
-  socket.emit("Topic 1", "somedata");
   socket.on("disconnect", (message) => {
     console.log("Client Disconncted", message);
   });
 });
-setInterval(() => {
-  io.emit("Topic 1", "somedata");
-  console.log("emitting");
-}, 2000);
+// io.on("connection", (socket) => {
+//   console.log("New Client Connected", socket.id);
+//   socket.emit("Topic 1", "somedata");
+//   socket.on("disconnect", (message) => {
+//     console.log("Client Disconncted", message);
+//   });
+// });
+// setInterval(() => {
+//   io.emit("Topic 1", "somedata");
+//   console.log("emitting");
+// }, 2000);
 
 server.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);

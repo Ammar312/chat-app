@@ -2,3 +2,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.textArea::-webkit-scrollbar {
+  display: none;
+}
+.conversation-container {
+  height: calc(100vh - 107px); /* Adjust as needed */
+  overflow-y: auto;
+}
