@@ -2,9 +2,12 @@ import axios from "axios";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { Link, useParams, useLocation } from "react-router-dom";
+import dayjs from "dayjs";
 import { baseURL } from "../core";
 import { FaChevronCircleLeft, FaChevronRight } from "react-icons/fa";
 import { GlobalContext } from "../context/context";
+import relativeTime from "dayjs/plugin/relativeTime";
+
 const Conversation = () => {
   const [messages, setMessages] = useState(null);
   const [recipient, setRecipient] = useState(null);
@@ -15,6 +18,7 @@ const Conversation = () => {
   const location = useLocation();
   const currentUserId = state.user._id;
   const ref = useRef();
+  dayjs.extend(relativeTime);
 
   useEffect(() => {
     setRecipient(location.state);
@@ -108,7 +112,7 @@ const Conversation = () => {
           {recipient?.username}
         </p>
       </header>
-      <div className="p-2 flex-1 flex flex-col  gap-2 w-full h-full overflow-y-auto bg-gray-300">
+      <div className="p-4 flex-1 flex flex-col  gap-2 w-full h-full overflow-y-auto bg-gray-300">
         {messages?.map((message, index) => {
           return (
             <span
@@ -120,7 +124,10 @@ const Conversation = () => {
                   : `p-2  rounded-tl-2xl rounded-br-2xl rounded-bl-2xl self-end bg-blue-400 text-white`
               }
             >
-              {message.message}
+              <p className="text-xl">{message.message}</p>
+              <p className="text-xs text-right">
+                {dayjs(message.createdAt).fromNow(true)}
+              </p>
             </span>
           );
         })}

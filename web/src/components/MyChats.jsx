@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 const MyChats = () => {
   const { state, dispatch } = useContext(GlobalContext);
   const [chats, setChats] = useState([]);
+
   const navigate = useNavigate();
   useEffect(() => {
     const getMyChats = async () => {
@@ -22,14 +23,15 @@ const MyChats = () => {
   }, []);
   return (
     <div>
+      <h1 className="text-4xl font-medium mb-4 mt-2 mx-1">My Chats</h1>
       <div>
         {chats.map((chat, index) => {
           return (
             <div
-              className="border-b flex gap-4 p-2 items-center cursor-pointer"
+              className="border-b flex gap-4 p-2 items-center cursor-pointer hover:bg-gray-200"
               key={index}
             >
-              <span className="w-12 h-12 rounded-full bg-gray-200 flex items-end justify-center">
+              <span className="w-12 h-12 rounded-full bg-gray-300 flex items-end justify-center overflow-hidden">
                 <FaUser className="text-white text-4xl" />
               </span>
               {chat.participants

@@ -12,6 +12,7 @@ import authRouter from "./routes/auth.mjs";
 import myChatRouter from "./routes/mychat.mjs";
 import connectMongoDB from "./connectDB.mjs";
 import USER from "./models/user.mjs";
+import searchRouter from "./routes/search.mjs";
 import mongoose from "mongoose";
 import responseFunc from "./utilis/response.mjs";
 import { socketUsers } from "./core.mjs";
@@ -69,23 +70,10 @@ app.get("/api/profile", async (req, res) => {
     console.log("profileFetchedError", error);
   }
 });
-app.get("/api/allusers", async (req, res) => {
-  const page = Number(req.query.page) || 1;
-  const pageSize = Number(req.query.pageSize) || 2;
-  const skip = (page - 1) * pageSize;
-  try {
-    const allusers = await USER.find({}, { _id: 1, username: 1, email: 1 })
-      .skip(skip)
-      .limit(pageSize);
-    res.send(allusers);
-  } catch (error) {
-    console.log(error);
-    res.send({ message: "Error in getting users" });
-  }
-});
 
 app.use("/api", myChatRouter);
 app.use("/api", messageRouter);
+app.use("/api", searchRouter);
 
 app.use("/", (req, res) => {
   res.send("404 Not Found");
@@ -98,18 +86,18 @@ export const io = new Server(server, {
     methods: "*",
   },
 });
-io.use((socket, next) => {
-  console.log("socket", socket.request.headers.cookie);
-  const parsedCookies = cookie.parse(socket.request.headers.cookie || "");
-  console.log("parsedCookies: ", parsedCookies.token);
-  try {
-    const decoded = Jwt.verify(parsedCookies.token, process.env.SECRET);
-    socketUsers[decoded._id] = socket;
-    next();
-  } catch (error) {
-    return next(new Error("Authentication error"));
-  }
-});
+// io.use((socket, next) => {
+//   console.log("socket", socket.request.headers.cookie);
+//   const parsedCookies = cookie.parse(socket.request.headers.cookie || "");
+//   console.log("parsedCookies: ", parsedCookies.token);
+//   try {
+//     const decoded = Jwt.verify(parsedCookies.token, process.env.SECRET);
+//     socketUsers[decoded._id] = socket;
+//     next();
+//   } catch (error) {
+//     return next(new Error("Authentication error"));
+//   }
+// });
 io.on("connection", (socket) => {
   console.log("New Client Connected", socket.id);
   socket.on("disconnect", (message) => {

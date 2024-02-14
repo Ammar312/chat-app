@@ -43,7 +43,7 @@ const messageSchema = new Schema(
       default: false,
     },
   },
-  { timestamp: true }
+  { timestamps: true }
 );
 
 // messageSchema.index({ fromEmail: 1 }, { unique: false });

@@ -1,6 +1,7 @@
 import { stringToHash, verifyHash } from "bcrypt-inzi";
 import Jwt from "jsonwebtoken";
 import USER from "../models/user.mjs";
+import responseFunc from "../utilis/response.mjs";
 
 export const signupController = async (req, res) => {
   if (!req.body.email || !req.body.username || !req.body.password) {
