@@ -15,6 +15,7 @@ const MyChats = () => {
       try {
         const response = await axios.get(`${baseURL}api/mychats`);
         setChats(response.data);
+        console.log(response.data);
       } catch (error) {
         console.log(error);
       }
@@ -27,29 +28,31 @@ const MyChats = () => {
       <div>
         {chats.map((chat, index) => {
           return (
-            <div
-              className="border-b flex gap-4 p-2 items-center cursor-pointer hover:bg-gray-200"
-              key={index}
-            >
-              <span className="w-12 h-12 rounded-full bg-gray-300 flex items-end justify-center overflow-hidden">
-                <FaUser className="text-white text-4xl" />
-              </span>
-              {chat.participants
-                .filter((per) => per._id !== state.user._id)
-                .map((participant, index) => (
-                  <div
-                    key={index}
-                    className="text-2xl first-letter:capitalize w-full"
-                    onClick={() =>
-                      navigate(`/conversation/${chat._id}`, {
-                        state: participant,
-                      })
-                    }
-                  >
-                    {participant.username}
-                  </div>
-                ))}
-            </div>
+            chat.isNew === false && (
+              <div
+                className="border-b flex gap-4 p-2 items-center cursor-pointer hover:bg-gray-200"
+                key={index}
+              >
+                <span className="w-12 h-12 rounded-full bg-gray-300 flex items-end justify-center overflow-hidden">
+                  <FaUser className="text-white text-4xl" />
+                </span>
+                {chat.participants
+                  .filter((per) => per._id !== state.user._id)
+                  .map((participant, index) => (
+                    <div
+                      key={index}
+                      className="text-2xl first-letter:capitalize w-full"
+                      onClick={() =>
+                        navigate(`/conversation`, {
+                          state: participant,
+                        })
+                      }
+                    >
+                      {participant.username}
+                    </div>
+                  ))}
+              </div>
+            )
           );
         })}
       </div>

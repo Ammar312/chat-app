@@ -13,6 +13,10 @@ const conversationSchema = new Schema(
         required: true,
       },
     ],
+    isNew: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

@@ -50,10 +50,7 @@ const App = () => {
       {state.isLogin === true ? (
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route
-            path={`conversation/:conversationId`}
-            element={<Conversation />}
-          />
+          <Route path={`conversation`} element={<Conversation />} />
           {/* <Route path="conversation" element={<Conversation />} /> */}
           <Route path="*" element={<Navigate to="/" replace={true} />} />
         </Routes>

@@ -12,7 +12,8 @@ const Conversation = () => {
   const [messages, setMessages] = useState(null);
   const [recipient, setRecipient] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { conversationId } = useParams();
+  const [conversationId, setConversationId] = useState("");
+  // const { conversationId } = useParams();
   const { state, dispatch } = useContext(GlobalContext);
   const messageRef = useRef();
   const location = useLocation();
@@ -25,7 +26,8 @@ const Conversation = () => {
   }, [location.state]);
 
   useEffect(() => {
-    ref.current?.scrollIntoView({ behavior: "smooth" });
+    // ref.current?.scrollIntoView({ behavior: "smooth" });
+    getConversationId();
   }, [loading]);
 
   useEffect(() => {
@@ -54,11 +56,20 @@ const Conversation = () => {
       socket.close();
     };
   }, [recipient]);
-
+  const getConversationId = async () => {
+    try {
+      const response = await axios.post(`${baseURL}api/checkchat`, {
+        recipientId: recipient?._id,
+      });
+      setConversationId(response.data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const getConversation = async () => {
     try {
       const response = await axios.post(`${baseURL}api/getmessages`, {
-        conversationId,
+        conversationId: conversationId,
       });
       console.log(response.data);
       setMessages([...response.data]);
@@ -83,6 +94,7 @@ const Conversation = () => {
   const sendMessage = async (e) => {
     try {
       const response = await axios.post(`${baseURL}api/sendmessage`, {
+        conversationId: conversationId,
         to: recipient?._id,
         message: messageRef.current.value,
       });

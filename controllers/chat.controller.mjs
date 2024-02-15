@@ -4,8 +4,32 @@ import mongoose from "mongoose";
 import responseFunc from "../utilis/response.mjs";
 import { io } from "../index.mjs";
 
+export const checkConversationFunction = async (req, res) => {
+  const currentUserId = req.currentUser._id;
+  const { recipientId } = req.body;
+  try {
+    const checkConversation = await Conversation.findOne({
+      participants: {
+        $all: [currentUserId, recipientId],
+      },
+    });
+    console.log(checkConversation);
+    if (checkConversation) {
+      responseFunc(res, 200, "Available", checkConversation._id);
+    } else {
+      const createConversation = await Conversation.create({
+        participants: [currentUserId, recipientId],
+      });
+      responseFunc(res, 200, "Created", createConversation._id);
+    }
+  } catch (error) {
+    console.log(error);
+    responseFunc(res, 500, "Server Error");
+  }
+};
+
 export const postMessage = async (req, res, next) => {
-  if (!req.body.to || !req.body.message) {
+  if (!req.body.conversationId || !req.body.to || !req.body.message) {
     // res.status(403).send({ message: "Required parameter missing!" });
     responseFunc(res, 403, `Required parameter missing!`);
     return;
@@ -18,33 +42,46 @@ export const postMessage = async (req, res, next) => {
   try {
     const senderId = new mongoose.Types.ObjectId(req.currentUser._id);
     const recieverId = new mongoose.Types.ObjectId(req.body.to);
-    const checkConversation = await Conversation.findOne({
-      participants: {
-        $all: [senderId, recieverId],
-      },
+    const conversationId = new mongoose.Types.ObjectId(req.body.conversationId);
+    // const checkConversation = await Conversation.findOne({
+    //   participants: {
+    //     $all: [senderId, recieverId],
+    //   },
+    // });
+
+    const message = await Message.create({
+      conversationId: new mongoose.Types.ObjectId(conversationId),
+      from: new mongoose.Types.ObjectId(req.currentUser._id),
+      to: new mongoose.Types.ObjectId(req.body.to),
+      message: req.body.message,
     });
-    if (checkConversation) {
-      const message = await Message.create({
-        conversationId: new mongoose.Types.ObjectId(checkConversation._id),
-        from: new mongoose.Types.ObjectId(req.currentUser._id),
-        to: new mongoose.Types.ObjectId(req.body.to),
-        message: req.body.message,
-      });
-      io.emit(`${req.body.to}-${req.currentUser._id}`, message);
-    } else {
-      const createConversation = await Conversation.create({
-        participants: [senderId, recieverId],
-      });
-      console.log("createconversation", createConversation);
-      const message = await Message.create({
-        conversationId: new mongoose.Types.ObjectId(createConversation._id),
-        from: new mongoose.Types.ObjectId(req.currentUser._id),
-        to: new mongoose.Types.ObjectId(req.body.to),
-        message: req.body.message,
-      });
-      io.emit(`${req.body.to}-${req.currentUser._id}`, message);
+    io.emit(`${req.body.to}-${req.currentUser._id}`, message);
+    const updateConversation = await Conversation.findOne({
+      _id: new mongoose.Types.ObjectId(conversationId),
+      isNew: true,
+    });
+    if (updateConversation) {
+      await Conversation.updateOne(
+        {
+          _id: new mongoose.Types.ObjectId(conversationId),
+          isNew: true,
+        },
+        { $set: { isNew: false } }
+      );
     }
-    console.log("checkconversaton", checkConversation);
+    //  else {
+    //   const createConversation = await Conversation.create({
+    //     participants: [senderId, recieverId],
+    //   });
+    //   console.log("createconversation", createConversation);
+    //   const message = await Message.create({
+    //     conversationId: new mongoose.Types.ObjectId(createConversation._id),
+    //     from: new mongoose.Types.ObjectId(req.currentUser._id),
+    //     to: new mongoose.Types.ObjectId(req.body.to),
+    //     message: req.body.message,
+    //   });
+    //   io.emit(`${req.body.to}-${req.currentUser._id}`, message);
+    // }
 
     // res.send({ message: "Message sent" });
     responseFunc(res, 201, "Message Sent");
@@ -108,6 +145,7 @@ export const myChats = async (req, res) => {
         $project: {
           _id: 1,
           messages: 1,
+          isNew: 1,
           "participants._id": 1,
           "participants.username": 1,
           "participants.email": 1,
