@@ -26,9 +26,10 @@ const Conversation = () => {
   }, [location.state]);
 
   useEffect(() => {
-    // ref.current?.scrollIntoView({ behavior: "smooth" });
-    getConversationId();
-  }, [loading]);
+    if (recipient) {
+      getConversationId();
+    }
+  }, [recipient]);
 
   useEffect(() => {
     if (conversationId) {
@@ -61,6 +62,7 @@ const Conversation = () => {
       const response = await axios.post(`${baseURL}api/checkchat`, {
         recipientId: recipient?._id,
       });
+      console.log(response);
       setConversationId(response.data.data);
     } catch (error) {
       console.log(error);
