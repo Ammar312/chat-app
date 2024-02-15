@@ -1,10 +1,10 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import CreatePost from "../components/CreatePost";
 import Bar from "../components/Bar";
 import { GlobalContext } from "../context/context";
 import axios from "axios";
 import { baseURL } from "../core";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import MyChats from "../components/MyChats";
 import { Dropdown, Modal } from "antd";
 import { FaUser } from "react-icons/fa6";
@@ -14,6 +14,8 @@ const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [users, setUsers] = useState([]);
   const currentUserId = state.user._id;
+  const searchRef = useRef();
+  const navigate = useNavigate();
 
   const logoutHandle = async () => {
     try {
@@ -35,7 +37,11 @@ const Home = () => {
 
   const items = [
     {
-      label: <div onClick={logoutHandle}>Logout</div>,
+      label: (
+        <div onClick={logoutHandle} className="text-red-400">
+          Logout
+        </div>
+      ),
       key: "0",
     },
   ];
@@ -56,6 +62,19 @@ const Home = () => {
   };
   const handleCancel = () => {
     setIsModalOpen(false);
+    setUsers([]);
+    searchRef.current.value = "";
+  };
+  const searchUser = async (e) => {
+    e.preventDefault();
+    try {
+      const user = searchRef.current.value;
+      const response = await axios.get(`${baseURL}api/search?search=${user}`);
+      console.log(response);
+      setUsers(response.data.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -79,26 +98,45 @@ const Home = () => {
       </header>
       <MyChats />
 
-      <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-        <form>
-          <input type="text" />
+      <Modal
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        footer={null}
+      >
+        <form className="border-b mt-5 mb-3" onSubmit={searchUser}>
+          <input
+            type="text"
+            className="p-2 pb-0 text-xl w-full outline-none placeholder:text-lg"
+            placeholder="Search a user..."
+            ref={searchRef}
+          />
         </form>
         <div className="max-h-[250px] overflow-y-auto">
-          {users
-            .filter((user) => currentUserId !== user._id)
-            .map((eachUser, index) => {
-              return (
-                <div
-                  key={index}
-                  className="border-b flex gap-4 p-2 items-center cursor-pointer"
-                >
-                  <span className="w-10 h-10 rounded-full bg-gray-300 flex items-end justify-center overflow-hidden">
-                    <FaUser className="text-white text-3xl" />
-                  </span>
-                  <div className="text-black">{eachUser.username}</div>
-                </div>
-              );
-            })}
+          {users?.length ? (
+            users
+              ?.filter((user) => currentUserId !== user._id)
+              ?.map((eachUser, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="border-b flex gap-4 p-2 items-center cursor-pointer hover:bg-gray-100"
+                    onClick={() =>
+                      navigate(`/conversation`, { state: eachUser })
+                    }
+                  >
+                    <span className="w-10 h-10 rounded-full bg-gray-300 flex items-end justify-center overflow-hidden">
+                      <FaUser className="text-white text-3xl" />
+                    </span>
+                    <div className="text-black first-letter:capitalize text-lg">
+                      {eachUser.username}
+                    </div>
+                  </div>
+                );
+              })
+          ) : (
+            <div>No User Found</div>
+          )}
         </div>
       </Modal>
     </div>

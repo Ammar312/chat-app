@@ -54,6 +54,7 @@ const App = () => {
             path={`conversation/:conversationId`}
             element={<Conversation />}
           />
+          {/* <Route path="conversation" element={<Conversation />} /> */}
           <Route path="*" element={<Navigate to="/" replace={true} />} />
         </Routes>
       ) : null}

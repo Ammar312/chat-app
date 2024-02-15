@@ -6,19 +6,19 @@ const router = express.Router();
 router.get("/search", async (req, res) => {
   let search = req.query.search;
   try {
-    const result = await USER.aggregate([
-      {
-        $search: {
-          index: "text",
-          text: {
-            query: search,
-            path: ["username", "email"],
-            // fuzzy: {},
-          },
-        },
-      },
-    ]).exec();
-
+    // const result = await USER.aggregate([
+    //   {
+    //     $search: {
+    //       index: "text",
+    //       text: {
+    //         query: search,
+    //         path: ["username", "email"],
+    //         // fuzzy: {},
+    //       },
+    //     },
+    //   },
+    // ]).exec();
+    const result = await USER.find({ $text: { $search: search } }).exec();
     if (result.length) {
       responseFunc(res, 200, "User fetched", result);
     } else {

@@ -23,12 +23,17 @@ const Conversation = () => {
   useEffect(() => {
     setRecipient(location.state);
   }, [location.state]);
+
   useEffect(() => {
     ref.current?.scrollIntoView({ behavior: "smooth" });
   }, [loading]);
+
   useEffect(() => {
-    getConversation();
-  }, []);
+    if (conversationId) {
+      getConversation();
+    }
+  }, [conversationId]);
+
   useEffect(() => {
     const socket = io("http://localhost:3000");
     socket.on("connect", () => {
