@@ -13,7 +13,7 @@ export const checkConversationFunction = async (req, res) => {
         $all: [currentUserId, recipientId],
       },
     });
-    console.log(checkConversation);
+
     if (checkConversation) {
       responseFunc(res, 200, "Available", checkConversation._id);
     } else {
@@ -30,25 +30,18 @@ export const checkConversationFunction = async (req, res) => {
 
 export const postMessage = async (req, res, next) => {
   if (!req.body.conversationId || !req.body.to || !req.body.message) {
-    // res.status(403).send({ message: "Required parameter missing!" });
     responseFunc(res, 403, `Required parameter missing!`);
     return;
   }
   if (req.currentUser._id === req.body.to) {
     responseFunc(res, 400, "You can't send message to yourself");
-    // res.send({ message: "You can't send message to yourself" });
+
     return;
   }
   try {
     const senderId = new mongoose.Types.ObjectId(req.currentUser._id);
     const recieverId = new mongoose.Types.ObjectId(req.body.to);
     const conversationId = new mongoose.Types.ObjectId(req.body.conversationId);
-    // const checkConversation = await Conversation.findOne({
-    //   participants: {
-    //     $all: [senderId, recieverId],
-    //   },
-    // });
-
     const message = await Message.create({
       conversationId: new mongoose.Types.ObjectId(conversationId),
       from: new mongoose.Types.ObjectId(req.currentUser._id),
@@ -69,26 +62,10 @@ export const postMessage = async (req, res, next) => {
         { $set: { isNew: false } }
       );
     }
-    //  else {
-    //   const createConversation = await Conversation.create({
-    //     participants: [senderId, recieverId],
-    //   });
-    //   console.log("createconversation", createConversation);
-    //   const message = await Message.create({
-    //     conversationId: new mongoose.Types.ObjectId(createConversation._id),
-    //     from: new mongoose.Types.ObjectId(req.currentUser._id),
-    //     to: new mongoose.Types.ObjectId(req.body.to),
-    //     message: req.body.message,
-    //   });
-    //   io.emit(`${req.body.to}-${req.currentUser._id}`, message);
-    // }
-
-    // res.send({ message: "Message sent" });
     responseFunc(res, 201, "Message Sent");
   } catch (error) {
     console.log("postmessageerror", error);
     responseFunc(res, 500, "Error in sending message");
-    // res.send({ message: "Error in sending message" });
   }
 };
 

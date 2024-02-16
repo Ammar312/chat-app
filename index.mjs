@@ -30,13 +30,13 @@ app.use(cookieParser());
 connectMongoDB(process.env.MONGO_URI);
 
 app.use("/api", authRouter);
-
+let currentUserId;
 app.use("/api", (req, res, next) => {
   const token = req.cookies.token;
-  console.log("token", token);
+
   try {
     const decoded = Jwt.verify(token, process.env.SECRET);
-    console.log("decoded", decoded);
+
     req.body.decoded = {
       username: decoded.username,
       email: decoded.email,
@@ -55,11 +55,13 @@ app.use("/api", (req, res, next) => {
     return;
   }
 });
+
 app.get("/api/profile", async (req, res) => {
   const { _id } = req.currentUser;
+  currentUserId = _id;
   try {
     const result = await USER.findOne({
-      _id: new mongoose.Types.ObjectId(_id),
+      _id,
     });
     responseFunc(res, 200, "Profile Fetched", {
       username: result.username,
@@ -70,7 +72,7 @@ app.get("/api/profile", async (req, res) => {
     console.log("profileFetchedError", error);
   }
 });
-
+console.log("currentUserId", currentUserId);
 app.use("/api", myChatRouter);
 app.use("/api", messageRouter);
 app.use("/api", searchRouter);
@@ -98,10 +100,27 @@ export const io = new Server(server, {
 //     return next(new Error("Authentication error"));
 //   }
 // });
+const userPresence = new Map();
 io.on("connection", (socket) => {
   console.log("New Client Connected", socket.id);
-  socket.on("disconnect", (message) => {
-    console.log("Client Disconncted", message);
+  socket.on("setUserId", (userId) => {
+    userPresence.set(userId, socket.id); // Set user as online when they connect
+    io.emit("userPresence", {
+      userId,
+      status: "online",
+      onlineUser: userPresence,
+    });
+    console.log(userPresence);
+  });
+
+  socket.on("disconnect", () => {
+    const userId = [...userPresence.entries()].find(
+      ([key, value]) => value === socket.id
+    )?.[0];
+    if (userId) {
+      userPresence.delete(userId); // Remove user when they disconnect
+      io.emit("userPresence", { userId, status: "offline" });
+    }
   });
 });
 // io.on("connection", (socket) => {

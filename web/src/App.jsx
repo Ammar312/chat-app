@@ -7,6 +7,7 @@ import axios from "axios";
 import { GlobalContext } from "./context/context";
 import { baseURL } from "./core";
 import Conversation from "./pages/Conversation";
+import { TailSpin } from "react-loader-spinner";
 
 const App = () => {
   const { state, dispatch } = useContext(GlobalContext);
@@ -64,8 +65,17 @@ const App = () => {
       ) : null}
 
       {state.isLogin === null ? (
-        <div>
-          <h1>Loading</h1>
+        <div className="fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]">
+          <TailSpin
+            visible={true}
+            height="80"
+            width="80"
+            color="#48cae4"
+            ariaLabel="tail-spin-loading"
+            radius="4"
+            wrapperStyle={{}}
+            wrapperClass=""
+          />
         </div>
       ) : null}
     </BrowserRouter>
