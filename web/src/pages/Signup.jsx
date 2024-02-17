@@ -31,7 +31,7 @@ const Signup = () => {
     }
   };
   return (
-    <div className="bg-blue-200 min-h-screen flex justify-center items-center">
+    <div className="bg-blue-300 min-h-screen flex justify-center items-center">
       <div className=" bg-white px-8 pt-10 pb-6 w-[360px]">
         <p className=" text-center font-semibold text-4xl mb-6 text-blue-600">
           Register

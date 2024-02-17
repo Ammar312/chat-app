@@ -32,7 +32,7 @@ const Login = () => {
     } catch (error) {}
   };
   return (
-    <div className="bg-blue-200 min-h-screen flex justify-center items-center">
+    <div className="bg-blue-400 min-h-screen flex justify-center items-center">
       <div className=" bg-white px-8 pt-10 pb-6 w-[360px]">
         <p className=" text-center font-semibold text-4xl mb-6 text-blue-600">
           Login
@@ -56,7 +56,7 @@ const Login = () => {
 
             <button
               type="submit"
-              className=" bg-blue-400 text-white p-2 text-lg hover:rounded-md transition-all mt-5"
+              className=" bg-blue-300 text-white p-2 text-lg hover:rounded-md transition-all mt-5"
             >
               Login
             </button>
@@ -65,7 +65,7 @@ const Login = () => {
         <div className=" text-center my-4 text-blue-900">
           Don't Have Account? <Link to="/signup">Signup</Link>
         </div>
-        <div>{JSON.stringify(state)}</div>
+        {/* <div>{JSON.stringify(state)}</div> */}
       </div>
     </div>
   );
