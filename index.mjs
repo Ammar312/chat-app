@@ -11,11 +11,13 @@ import messageRouter from "./routes/message.mjs";
 import authRouter from "./routes/auth.mjs";
 import myChatRouter from "./routes/mychat.mjs";
 import connectMongoDB from "./connectDB.mjs";
+import apiRoutes from "./routes/index.routes.mjs";
 import USER from "./models/user.mjs";
 import searchRouter from "./routes/search.mjs";
 import mongoose from "mongoose";
 import responseFunc from "./utilis/response.mjs";
 import { socketUsers } from "./core.mjs";
+import jwtMiddleware from "./middlewares/jwt.middleware.mjs";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,35 +32,33 @@ app.use(cookieParser());
 connectMongoDB(process.env.MONGO_URI);
 
 app.use("/api", authRouter);
-let currentUserId;
-app.use("/api", (req, res, next) => {
-  const token = req.cookies.token;
+// app.use("/api", (req, res, next) => {
+//   const token = req.cookies.token;
 
-  try {
-    const decoded = Jwt.verify(token, process.env.SECRET);
+//   try {
+//     const decoded = Jwt.verify(token, process.env.SECRET);
 
-    req.body.decoded = {
-      username: decoded.username,
-      email: decoded.email,
-      _id: decoded._id,
-    };
+//     req.body.decoded = {
+//       username: decoded.username,
+//       email: decoded.email,
+//       _id: decoded._id,
+//     };
 
-    req.currentUser = {
-      username: decoded.username,
-      email: decoded.email,
-      _id: decoded._id,
-    };
-    next();
-  } catch (error) {
-    console.log("errorabc", error);
-    res.status(401).send({ message: "Unauthorized" });
-    return;
-  }
-});
+//     req.currentUser = {
+//       username: decoded.username,
+//       email: decoded.email,
+//       _id: decoded._id,
+//     };
+//     next();
+//   } catch (error) {
+//     console.log("errorabc", error);
+//     res.status(401).send({ message: "Unauthorized" });
+//     return;
+//   }
+// });
 
-app.get("/api/profile", async (req, res) => {
+app.get("/api/profile", jwtMiddleware, async (req, res) => {
   const { _id } = req.currentUser;
-  currentUserId = _id;
   try {
     const result = await USER.findOne({
       _id,
@@ -72,14 +72,8 @@ app.get("/api/profile", async (req, res) => {
     console.log("profileFetchedError", error);
   }
 });
-console.log("currentUserId", currentUserId);
-app.use("/api", myChatRouter);
-app.use("/api", messageRouter);
-app.use("/api", searchRouter);
 
-app.use("/", (req, res) => {
-  res.send("404 Not Found");
-});
+app.use("/api", apiRoutes);
 
 const server = createServer(app);
 export const io = new Server(server, {

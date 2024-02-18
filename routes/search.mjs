@@ -1,9 +1,10 @@
 import express from "express";
 import USER from "../models/user.mjs";
 import responseFunc from "../utilis/response.mjs";
+import jwtMiddleware from "../middlewares/jwt.middleware.mjs";
 const router = express.Router();
 
-router.get("/search", async (req, res) => {
+router.get("/search", jwtMiddleware, async (req, res) => {
   let search = req.query.search;
   try {
     // const result = await USER.aggregate([

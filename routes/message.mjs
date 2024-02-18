@@ -4,11 +4,11 @@ import {
   postMessage,
   readMessage,
 } from "../controllers/chat.controller.mjs";
-
+import jwtMiddleware from "../middlewares/jwt.middleware.mjs";
 const router = express.Router();
 
-router.post("/sendmessage", postMessage);
-router.post("/getmessages", getMessages);
-router.put("/message/readmessage", readMessage);
+router.post("/sendmessage", jwtMiddleware, postMessage);
+router.post("/getmessages", jwtMiddleware, getMessages);
+router.put("/message/readmessage", jwtMiddleware, readMessage);
 
 export default router;
