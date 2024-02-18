@@ -18,13 +18,18 @@ router.get("/search", async (req, res) => {
     //     },
     //   },
     // ]).exec();
-    const result = await USER.find({ $text: { $search: search } }).exec();
+
+    const result = await USER.find({
+      username: { $regex: `${search}`, $options: "i" },
+    }).exec();
+    console.log(result);
     if (result.length) {
       responseFunc(res, 200, "User fetched", result);
     } else {
       res.send("No user found");
     }
   } catch (error) {
+    console.log(error);
     res.send("Error In Fetching User");
   }
 });
