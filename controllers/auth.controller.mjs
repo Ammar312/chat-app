@@ -2,6 +2,7 @@ import { stringToHash, verifyHash } from "bcrypt-inzi";
 import Jwt from "jsonwebtoken";
 import USER from "../models/user.mjs";
 import responseFunc from "../utilis/response.mjs";
+import { uploadCloudinary } from "../utilis/cloudinary.mjs";
 
 export const signupController = async (req, res) => {
   const { username, email, password } = req.body;
@@ -13,6 +14,15 @@ export const signupController = async (req, res) => {
   email.trim();
   password.trim();
   try {
+    const file = req.file;
+    if (file.size > 2000000) {
+      // size bytes, limit of 2MB
+      res
+        .status(403)
+        .send({ message: "File size limit exceed, max limit 2MB" });
+      return;
+    }
+    const img = await uploadCloudinary(file.path);
     const result = await USER.findOne({
       email,
     });

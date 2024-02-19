@@ -7,18 +7,23 @@ const Signup = () => {
   const inputRef = useRef(null);
   const baseURL = "http://localhost:3000/";
   const { state, dispatch } = useContext(GlobalContext);
+  const [img, setImg] = useState(null);
   const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const username = inputRef.current[0].value;
-    const email = inputRef.current[1].value;
-    const password = inputRef.current[2].value;
+    const formData = new FormData();
+    formData.append("username", inputRef.current[0].value);
+    formData.append("email", inputRef.current[1].value);
+    formData.append("password", inputRef.current[2].value);
+    formData.append("profileImg", inputRef.current[3].files[0]);
+    // const username = inputRef.current[0].value;
+    // const email = inputRef.current[1].value;
+    // const password = inputRef.current[2].value;
 
     try {
-      const response = await axios.post(`${baseURL}api/signup`, {
-        username,
-        email,
-        password,
+      const response = await axios.post(`${baseURL}api/signup`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
       });
       dispatch({
         type: "USER_LOGIN",
@@ -40,6 +45,7 @@ const Signup = () => {
           <form
             className="flex flex-col gap-3"
             onSubmit={handleSubmit}
+            encType="multipart/form-data"
             ref={inputRef}
           >
             <input
@@ -62,14 +68,31 @@ const Signup = () => {
               required
             />
 
-            {/* <label
-              htmlFor="file"
-              className="flex items-center gap-2 cursor-pointer"
+            <label
+              htmlFor="profileImg"
+              className="bg-black text-center rounded-full w-[60px] h-[60px] overflow-hidden flex justify-center items-center"
             >
-              <img src={addAvatar} alt="addavatar" className="w-10" />
-              <span className=" text-blue-800">Add Your Image</span>
+              {img ? (
+                <img
+                  src={img}
+                  alt=""
+                  className="w-[60px] h-[60px] object-cover rounded-full"
+                />
+              ) : (
+                // <i className="bi bi-person text-blue-400 mr-3 text-[40px]  mx-auto"></i>
+                <span>No image</span>
+              )}
             </label>
-            <input type="file" name="" id="file" className="hidden" /> */}
+            <input
+              type="file"
+              className="hidden"
+              id="profileImg"
+              accept="image/*"
+              onChange={(e) => {
+                const base64Url = URL.createObjectURL(e.target.files[0]);
+                setImg(base64Url);
+              }}
+            />
             <button
               type="submit"
               className=" bg-blue-400 text-white p-2 text-lg hover:rounded-md transition-all mt-5"
