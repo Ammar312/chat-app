@@ -1,6 +1,4 @@
 import React, { useContext, useRef, useState } from "react";
-import CreatePost from "../components/CreatePost";
-import Bar from "../components/Bar";
 import { GlobalContext } from "../context/context";
 import axios from "axios";
 import { baseURL } from "../core";
@@ -91,7 +89,9 @@ const Home = () => {
               {/* <span className="w-10 h-10 rounded-full bg-gray-200 flex items-end justify-center overflow-hidden">
                 <FaUser className="text-white text-4xl" />
               </span> */}
-              <span className="text-2xl">{state.user.username}</span>
+              <span className="text-2xl first-letter:capitalize">
+                {state.user.username}
+              </span>
             </div>
           </Dropdown>
         </div>

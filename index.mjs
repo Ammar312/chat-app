@@ -1,23 +1,12 @@
 import express from "express";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
-import Jwt from "jsonwebtoken";
 import cors from "cors";
 import { Server } from "socket.io";
 import { createServer } from "http";
-import cookie from "cookie";
 
-import messageRouter from "./routes/message.mjs";
-import authRouter from "./routes/auth.mjs";
-import myChatRouter from "./routes/mychat.mjs";
 import connectMongoDB from "./connectDB.mjs";
 import apiRoutes from "./routes/index.routes.mjs";
-import USER from "./models/user.mjs";
-import searchRouter from "./routes/search.mjs";
-import mongoose from "mongoose";
-import responseFunc from "./utilis/response.mjs";
-import { socketUsers } from "./core.mjs";
-import jwtMiddleware from "./middlewares/jwt.middleware.mjs";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -31,50 +20,10 @@ app.use(express.json());
 app.use(cookieParser());
 connectMongoDB(process.env.MONGO_URI);
 
-app.use("/api", authRouter);
-// app.use("/api", (req, res, next) => {
-//   const token = req.cookies.token;
-
-//   try {
-//     const decoded = Jwt.verify(token, process.env.SECRET);
-
-//     req.body.decoded = {
-//       username: decoded.username,
-//       email: decoded.email,
-//       _id: decoded._id,
-//     };
-
-//     req.currentUser = {
-//       username: decoded.username,
-//       email: decoded.email,
-//       _id: decoded._id,
-//     };
-//     next();
-//   } catch (error) {
-//     console.log("errorabc", error);
-//     res.status(401).send({ message: "Unauthorized" });
-//     return;
-//   }
-// });
-
-app.get("/api/profile", jwtMiddleware, async (req, res) => {
-  const { _id } = req.currentUser;
-  try {
-    const result = await USER.findOne({
-      _id,
-    });
-    responseFunc(res, 200, "Profile Fetched", {
-      username: result.username,
-      email: result.email,
-      _id: result._id,
-    });
-  } catch (error) {
-    console.log("profileFetchedError", error);
-  }
-});
-
+// Routes
 app.use("/api", apiRoutes);
 
+// Socket Server
 const server = createServer(app);
 export const io = new Server(server, {
   cors: {
@@ -82,18 +31,7 @@ export const io = new Server(server, {
     methods: "*",
   },
 });
-// io.use((socket, next) => {
-//   console.log("socket", socket.request.headers.cookie);
-//   const parsedCookies = cookie.parse(socket.request.headers.cookie || "");
-//   console.log("parsedCookies: ", parsedCookies.token);
-//   try {
-//     const decoded = Jwt.verify(parsedCookies.token, process.env.SECRET);
-//     socketUsers[decoded._id] = socket;
-//     next();
-//   } catch (error) {
-//     return next(new Error("Authentication error"));
-//   }
-// });
+
 const userPresence = new Map();
 io.on("connection", (socket) => {
   console.log("New Client Connected", socket.id);
@@ -104,7 +42,6 @@ io.on("connection", (socket) => {
       status: "online",
       onlineUser: userPresence,
     });
-    console.log(userPresence);
   });
 
   socket.on("disconnect", () => {
@@ -117,17 +54,6 @@ io.on("connection", (socket) => {
     }
   });
 });
-// io.on("connection", (socket) => {
-//   console.log("New Client Connected", socket.id);
-//   socket.emit("Topic 1", "somedata");
-//   socket.on("disconnect", (message) => {
-//     console.log("Client Disconncted", message);
-//   });
-// });
-// setInterval(() => {
-//   io.emit("Topic 1", "somedata");
-//   console.log("emitting");
-// }, 2000);
 
 server.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}`);

@@ -26,7 +26,7 @@ const MyChats = () => {
     <div>
       <h1 className="text-4xl font-medium mb-4 mt-2 mx-1">My Chats</h1>
       <div>
-        {chats.map((chat, index) => {
+        {chats?.map((chat, index) => {
           return (
             chat.isNew === false && (
               <div

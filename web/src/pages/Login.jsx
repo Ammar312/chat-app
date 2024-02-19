@@ -29,7 +29,9 @@ const Login = () => {
         type: "USER_LOGIN",
         payload: response.data.data,
       });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
   return (
     <div className="bg-blue-400 min-h-screen flex justify-center items-center">
@@ -47,16 +49,18 @@ const Login = () => {
               type="email"
               placeholder="abc@gmail.com"
               className="p-3 border-2 "
+              required
             />
             <input
               type="password"
               placeholder="Password"
               className="p-3 border-2 "
+              required
             />
 
             <button
               type="submit"
-              className=" bg-blue-300 text-white p-2 text-lg hover:rounded-md transition-all mt-5"
+              className=" bg-blue-400 text-white p-2 text-lg hover:rounded-md transition-all mt-5"
             >
               Login
             </button>

@@ -26,26 +26,26 @@ const App = () => {
       }
     );
   });
-
+  const checkLoginStatus = async () => {
+    try {
+      const response = await axios.get(`${baseURL}api/profile`, {
+        withCredentials: true,
+      });
+      dispatch({
+        type: "USER_LOGIN",
+        payload: response.data.data,
+      });
+    } catch (error) {
+      console.log(error);
+      dispatch({
+        type: "USER_LOGOUT",
+      });
+    }
+  };
   useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        const response = await axios.get(`${baseURL}api/profile`, {
-          withCredentials: true,
-        });
-        dispatch({
-          type: "USER_LOGIN",
-          payload: response.data.data,
-        });
-      } catch (error) {
-        console.log(error);
-        dispatch({
-          type: "USER_LOGOUT",
-        });
-      }
-    };
     checkLoginStatus();
   }, []);
+
   return (
     <BrowserRouter>
       {state.isLogin === true ? (

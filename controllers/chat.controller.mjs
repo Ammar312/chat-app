@@ -1,8 +1,8 @@
 import Conversation from "../models/conversation.mjs";
 import Message from "../models/message.mjs";
-import mongoose from "mongoose";
 import responseFunc from "../utilis/response.mjs";
 import { io } from "../index.mjs";
+import mongoose from "mongoose";
 
 export const checkConversationFunction = async (req, res) => {
   const currentUserId = req.currentUser._id;
@@ -19,6 +19,7 @@ export const checkConversationFunction = async (req, res) => {
     } else {
       const createConversation = await Conversation.create({
         participants: [currentUserId, recipientId],
+        isNew: true,
       });
       responseFunc(res, 200, "Created", createConversation._id);
     }
@@ -29,34 +30,32 @@ export const checkConversationFunction = async (req, res) => {
 };
 
 export const postMessage = async (req, res, next) => {
-  if (!req.body.conversationId || !req.body.to || !req.body.message) {
+  const { conversationId, to, message } = req.body;
+  if (!conversationId || !to || !message) {
     responseFunc(res, 403, `Required parameter missing!`);
     return;
   }
-  if (req.currentUser._id === req.body.to) {
+  if (req.currentUser._id === to) {
     responseFunc(res, 400, "You can't send message to yourself");
 
     return;
   }
   try {
-    const senderId = new mongoose.Types.ObjectId(req.currentUser._id);
-    const recieverId = new mongoose.Types.ObjectId(req.body.to);
-    const conversationId = new mongoose.Types.ObjectId(req.body.conversationId);
-    const message = await Message.create({
-      conversationId: new mongoose.Types.ObjectId(conversationId),
-      from: new mongoose.Types.ObjectId(req.currentUser._id),
-      to: new mongoose.Types.ObjectId(req.body.to),
-      message: req.body.message,
+    const createdMessage = await Message.create({
+      conversationId,
+      from: req.currentUser._id,
+      to: to,
+      message,
     });
-    io.emit(`${req.body.to}-${req.currentUser._id}`, message);
+    io.emit(`${to}-${req.currentUser._id}`, createdMessage);
     const updateConversation = await Conversation.findOne({
-      _id: new mongoose.Types.ObjectId(conversationId),
+      _id: conversationId,
       isNew: true,
     });
     if (updateConversation) {
       await Conversation.updateOne(
         {
-          _id: new mongoose.Types.ObjectId(conversationId),
+          _id: conversationId,
           isNew: true,
         },
         { $set: { isNew: false } }
@@ -70,7 +69,8 @@ export const postMessage = async (req, res, next) => {
 };
 
 export const getMessages = async (req, res) => {
-  if (!req.body.conversationId) {
+  const { conversationId } = req.body;
+  if (!conversationId) {
     responseFunc(res, 403, `required parameters missing`);
     return;
   }
@@ -79,7 +79,7 @@ export const getMessages = async (req, res) => {
   const skip = (page - 1) * pageSize;
   try {
     const result = await Message.find({
-      conversationId: new mongoose.Types.ObjectId(req.body.conversationId),
+      conversationId,
     })
       // .sort({ _id: -1 })
       // .skip(skip)
@@ -110,14 +110,14 @@ export const myChats = async (req, res) => {
           as: "participants",
         },
       },
-      {
-        $lookup: {
-          from: "messages",
-          localField: "_id",
-          foreignField: "conversationId",
-          as: "messages",
-        },
-      },
+      // {
+      //   $lookup: {
+      //     from: "messages",
+      //     localField: "_id",
+      //     foreignField: "conversationId",
+      //     as: "messages",
+      //   },
+      // },
       {
         $project: {
           _id: 1,
@@ -144,10 +144,10 @@ export const readMessage = async (req, res) => {
     return;
   }
   try {
-    const currentUserId = new mongoose.Types.ObjectId(req.currentUser._id);
+    const currentUserId = req.currentUser._id;
     const result = await Message.updateMany(
       {
-        conversationId: new mongoose.Types.ObjectId(conversationId),
+        conversationId: conversationId,
         to: currentUserId,
         isRead: false,
       },

@@ -4,21 +4,24 @@ import USER from "../models/user.mjs";
 import responseFunc from "../utilis/response.mjs";
 
 export const signupController = async (req, res) => {
-  if (!req.body.email || !req.body.username || !req.body.password) {
+  const { username, email, password } = req.body;
+  if (!email || !username || !password) {
     res.status(403).send({ message: "Required Paramater Missing" });
     return;
   }
-
+  username.trim();
+  email.trim();
+  password.trim();
   try {
     const result = await USER.findOne({
-      email: req.body.email,
+      email,
     });
 
     if (!result) {
-      const passwordHash = await stringToHash(req.body.password);
+      const passwordHash = await stringToHash(password);
       const user = await USER.create({
-        username: req.body.username,
-        email: req.body.email,
+        username,
+        email,
         password: passwordHash,
       });
       const token = Jwt.sign(
@@ -49,12 +52,14 @@ export const signupController = async (req, res) => {
   }
 };
 export const loginController = async (req, res) => {
-  if (!req.body.email || !req.body.password) {
+  const { email, password } = req.body;
+  if (!email || !password) {
     res.status(403).send({ message: "Required Paramater Missing" });
     return;
   }
 
-  const emailInLower = req.body.email.toString().toLowerCase();
+  const emailInLower = email.toString().toLowerCase().trim();
+  password.trim();
   try {
     const result = await USER.findOne({
       email: emailInLower,
@@ -63,7 +68,7 @@ export const loginController = async (req, res) => {
       res.status(401).send({ message: "Email or Password incorrect" });
       return;
     } else {
-      const isMatch = await verifyHash(req.body.password, result.password);
+      const isMatch = await verifyHash(password, result.password);
       if (isMatch) {
         const token = Jwt.sign(
           {
@@ -101,4 +106,20 @@ export const logoutController = (req, res) => {
   res.send({
     message: "Logout Successfully",
   });
+};
+
+export const getProfile = async (req, res) => {
+  const { _id } = req.currentUser;
+  try {
+    const result = await USER.findOne({
+      _id,
+    });
+    responseFunc(res, 200, "Profile Fetched", {
+      username: result.username,
+      email: result.email,
+      _id: result._id,
+    });
+  } catch (error) {
+    console.log("profileFetchedError", error);
+  }
 };

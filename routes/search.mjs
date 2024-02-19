@@ -5,7 +5,7 @@ import jwtMiddleware from "../middlewares/jwt.middleware.mjs";
 const router = express.Router();
 
 router.get("/search", jwtMiddleware, async (req, res) => {
-  let search = req.query.search;
+  const { search } = req.query;
   try {
     // const result = await USER.aggregate([
     //   {
@@ -23,7 +23,7 @@ router.get("/search", jwtMiddleware, async (req, res) => {
     const result = await USER.find({
       username: { $regex: `${search}`, $options: "i" },
     }).exec();
-    console.log(result);
+
     if (result.length) {
       responseFunc(res, 200, "User fetched", result);
     } else {
