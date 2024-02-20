@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useContext, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GlobalContext } from "../context/context";
+import { FaUser } from "react-icons/fa6";
 
 const Signup = () => {
   const inputRef = useRef(null);
@@ -12,10 +13,11 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-    formData.append("username", inputRef.current[0].value);
-    formData.append("email", inputRef.current[1].value);
-    formData.append("password", inputRef.current[2].value);
-    formData.append("profileImg", inputRef.current[3].files[0]);
+    formData.append("profileImg", inputRef.current[0].files?.[0]);
+    formData.append("username", inputRef.current[1].value);
+    formData.append("email", inputRef.current[2].value);
+    formData.append("password", inputRef.current[3].value);
+    // console.log("profileImg", inputRef.current[3].files[0]);
     // const username = inputRef.current[0].value;
     // const email = inputRef.current[1].value;
     // const password = inputRef.current[2].value;
@@ -48,6 +50,36 @@ const Signup = () => {
             encType="multipart/form-data"
             ref={inputRef}
           >
+            <div className="flex justify-center">
+              <label
+                htmlFor="profileImg"
+                className=" text-center rounded-full w-[80px] h-[80px] overflow-hidden flex justify-center cursor-pointer"
+              >
+                {img ? (
+                  <img
+                    src={img}
+                    alt=""
+                    className="w-[80px] h-[80px] object-cover rounded-full"
+                  />
+                ) : (
+                  // <i className="bi bi-person text-blue-400 mr-3 text-[40px]  mx-auto"></i>
+                  <span className="w-12 h-12 rounded-full bg-gray-300 flex items-end justify-center overflow-hidden">
+                    <FaUser className="text-white text-4xl" />
+                  </span>
+                )}
+              </label>
+            </div>
+
+            <input
+              type="file"
+              className="hidden"
+              id="profileImg"
+              accept="image/*"
+              onChange={(e) => {
+                const base64Url = URL.createObjectURL(e.target.files[0]);
+                setImg(base64Url);
+              }}
+            />
             <input
               type="text"
               placeholder="Username"
@@ -68,31 +100,6 @@ const Signup = () => {
               required
             />
 
-            <label
-              htmlFor="profileImg"
-              className="bg-black text-center rounded-full w-[60px] h-[60px] overflow-hidden flex justify-center items-center"
-            >
-              {img ? (
-                <img
-                  src={img}
-                  alt=""
-                  className="w-[60px] h-[60px] object-cover rounded-full"
-                />
-              ) : (
-                // <i className="bi bi-person text-blue-400 mr-3 text-[40px]  mx-auto"></i>
-                <span>No image</span>
-              )}
-            </label>
-            <input
-              type="file"
-              className="hidden"
-              id="profileImg"
-              accept="image/*"
-              onChange={(e) => {
-                const base64Url = URL.createObjectURL(e.target.files[0]);
-                setImg(base64Url);
-              }}
-            />
             <button
               type="submit"
               className=" bg-blue-400 text-white p-2 text-lg hover:rounded-md transition-all mt-5"

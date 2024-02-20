@@ -10,7 +10,11 @@ import upload from "../middlewares/multer.middleware.mjs";
 
 const router = express.Router();
 
-router.post("/signup", upload.single(""), signupController);
+router.post(
+  "/signup",
+  //  upload.single("profileImg"),
+  signupController
+);
 router.post("/login", loginController);
 router.post("/logout", logoutController);
 router.get("/profile", jwtMiddleware, getProfile);

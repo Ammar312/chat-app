@@ -1,4 +1,6 @@
 import { stringToHash, verifyHash } from "bcrypt-inzi";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import Jwt from "jsonwebtoken";
 import USER from "../models/user.mjs";
 import responseFunc from "../utilis/response.mjs";
@@ -14,15 +16,34 @@ export const signupController = async (req, res) => {
   email.trim();
   password.trim();
   try {
-    const file = req.file;
-    if (file.size > 2000000) {
-      // size bytes, limit of 2MB
-      res
-        .status(403)
-        .send({ message: "File size limit exceed, max limit 2MB" });
-      return;
+    // const file = req.file;
+    // console.log("file", file);
+    // if (file.size > 2000000) {
+    //   // size bytes, limit of 2MB
+    //   res
+    //     .status(403)
+    //     .send({ message: "File size limit exceed, max limit 2MB" });
+    //   return;
+    // }
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    if (!req.files || Object.keys(req.files).length === 0) {
+      return res.status(400).send("No files were uploaded.");
     }
-    const img = await uploadCloudinary(file.path);
+    const sampleFile = req.files.profileImg;
+    console.log(sampleFile);
+    const uploadPath = "uploads\\" + Date.now() + sampleFile.name;
+    console.log(uploadPath);
+    sampleFile.mv(
+      __dirname + `/uploads/${Date.now()}` + sampleFile.name,
+      (err) => {
+        if (err) return res.status(500).send(err);
+
+        // res.send("File uploaded!");
+      }
+    );
+
+    const img = await uploadCloudinary(uploadPath);
     const result = await USER.findOne({
       email,
     });
@@ -33,6 +54,8 @@ export const signupController = async (req, res) => {
         username,
         email,
         password: passwordHash,
+        imgUrl: img?.secure_url,
+        imgPublicId: img?.public_id,
       });
       const token = Jwt.sign(
         {
@@ -49,7 +72,13 @@ export const signupController = async (req, res) => {
       console.log(user);
       res.send({
         message: "Signup Successfully",
-        data: { username: user.username, email: user.email, _id: user._id },
+        data: {
+          username: user.username,
+          email: user.email,
+          _id: user._id,
+          imgUrl: user.imgUrl,
+          imgPublicId: user.imgPublicId,
+        },
       });
     } else {
       res.status(403).send({
@@ -98,6 +127,8 @@ export const loginController = async (req, res) => {
             username: result.username,
             email: result.email,
             _id: result._id,
+            imgUrl: result.imgUrl,
+            imgPublicId: result.imgPublicId,
           },
         });
         return;

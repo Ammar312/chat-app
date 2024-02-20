@@ -7,6 +7,8 @@ export const reducer = (state, action) => {
           username: action.payload?.username,
           email: action.payload?.email,
           _id: action.payload?._id,
+          imgUrl: action.payload?.imgUrl,
+          imgPublicId: action.payload?.imgPublicId,
         };
         return { ...state, isLogin: true, role, user };
       }

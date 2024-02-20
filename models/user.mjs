@@ -18,6 +18,12 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    imgUrl: {
+      type: String,
+    },
+    imgPublicId: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

@@ -86,12 +86,19 @@ const Home = () => {
             // trigger={["click"]}
           >
             <div className="flex flex-col items-center">
-              {/* <span className="w-10 h-10 rounded-full bg-gray-200 flex items-end justify-center overflow-hidden">
-                <FaUser className="text-white text-4xl" />
-              </span> */}
-              <span className="text-2xl first-letter:capitalize">
-                {state.user.username}
+              <span className="w-12 h-12 rounded-full bg-gray-200 flex items-end justify-center overflow-hidden ">
+                {state.user.imgUrl ? (
+                  <img
+                    src={state.user.imgUrl}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <FaUser className="text-white text-4xl" />
+                )}
               </span>
+              {/* <span className="text-2xl first-letter:capitalize">
+                {state.user.username}
+              </span> */}
             </div>
           </Dropdown>
         </div>
@@ -139,6 +146,7 @@ const Home = () => {
           )}
         </div>
       </Modal>
+      {/* <div>{JSON.stringify(state.user)}</div> */}
     </div>
   );
 };

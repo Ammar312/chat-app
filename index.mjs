@@ -2,12 +2,18 @@ import express from "express";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import fileUpload from "express-fileupload";
 import { Server } from "socket.io";
 import { createServer } from "http";
 
 import connectMongoDB from "./connectDB.mjs";
 import apiRoutes from "./routes/index.routes.mjs";
 
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(
@@ -18,10 +24,28 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: false }));
+app.use(fileUpload({ useTempFiles: true, tempFileDir: "/tmp/" }));
+// app.use(express.urlencoded({ extended: false }));
 connectMongoDB(process.env.MONGO_URI);
 
 // Routes
+app.post("/api/upload", (req, res) => {
+  if (!req.files || Object.keys(req.files).length === 0) {
+    return res.status(400).send("No files were uploaded.");
+  }
+  const sampleFile = req.files.sampleFile;
+  console.log(req.files);
+  const uploadPath = __dirname + `/uploads/${Date.now()}` + sampleFile.name;
+
+  sampleFile.mv(
+    __dirname + `/uploads/${Date.now()}` + sampleFile.name,
+    (err) => {
+      if (err) return res.status(500).send(err);
+
+      res.send("File uploaded!");
+    }
+  );
+});
 app.use("/api", apiRoutes);
 
 // Socket Server
