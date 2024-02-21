@@ -1,6 +1,4 @@
 import { stringToHash, verifyHash } from "bcrypt-inzi";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
 import Jwt from "jsonwebtoken";
 import USER from "../models/user.mjs";
 import responseFunc from "../utilis/response.mjs";
@@ -16,39 +14,21 @@ export const signupController = async (req, res) => {
   email.trim();
   password.trim();
   try {
-    // const file = req.file;
-    // console.log("file", file);
-    // if (file.size > 2000000) {
-    //   // size bytes, limit of 2MB
-    //   res
-    //     .status(403)
-    //     .send({ message: "File size limit exceed, max limit 2MB" });
-    //   return;
-    // }
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = dirname(__filename);
-    if (!req.files || Object.keys(req.files).length === 0) {
-      return res.status(400).send("No files were uploaded.");
-    }
-    const sampleFile = req.files.profileImg;
-    console.log(sampleFile);
-    const uploadPath = "uploads\\" + Date.now() + sampleFile.name;
-    console.log(uploadPath);
-    sampleFile.mv(
-      __dirname + `/uploads/${Date.now()}` + sampleFile.name,
-      (err) => {
-        if (err) return res.status(500).send(err);
-
-        // res.send("File uploaded!");
-      }
-    );
-
-    const img = await uploadCloudinary(uploadPath);
     const result = await USER.findOne({
       email,
     });
 
     if (!result) {
+      const file = req.file;
+      if (file.size > 2000000) {
+        // size bytes, limit of 2MB
+        res
+          .status(403)
+          .send({ message: "File size limit exceed, max limit 2MB" });
+        return;
+      }
+
+      const img = await uploadCloudinary(file.path);
       const passwordHash = await stringToHash(password);
       const user = await USER.create({
         username,
