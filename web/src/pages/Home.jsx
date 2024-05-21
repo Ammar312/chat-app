@@ -35,6 +35,11 @@ const Home = () => {
 
   const items = [
     {
+      label:(
+        <p>Your Profile</p>
+      )
+    },
+    {
       label: (
         <div onClick={logoutHandle} className="text-red-400">
           Logout

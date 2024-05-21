@@ -16,7 +16,6 @@ const jwtMiddleware = (req, res, next) => {
       email: decoded.email,
       _id: decoded._id,
     };
-    console.log("token verified");
     next();
   } catch (error) {
     console.log("errorabc", error);
