@@ -8,6 +8,7 @@ import { GlobalContext } from "./context/context";
 import { baseURL } from "./core";
 import Conversation from "./pages/Conversation";
 import { TailSpin } from "react-loader-spinner";
+import Profile from "./pages/Profile";
 
 const App = () => {
   const { state, dispatch } = useContext(GlobalContext);
@@ -52,6 +53,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path={`conversation`} element={<Conversation />} />
+          <Route path={`myprofile`} element={<Profile />} />
           {/* <Route path="conversation" element={<Conversation />} /> */}
           <Route path="*" element={<Navigate to="/" replace={true} />} />
         </Routes>

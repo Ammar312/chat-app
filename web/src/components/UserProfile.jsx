@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
-import Post from "./Post";
-import EditPostComp from "./EditPostComp";
+// import Post from "./Post";
+// import EditPostComp from "./EditPostComp";
 import { message } from "antd";
 import { baseURL } from "../core";
 import { useParams } from "react-router-dom";

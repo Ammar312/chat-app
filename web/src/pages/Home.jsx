@@ -36,7 +36,7 @@ const Home = () => {
   const items = [
     {
       label:(
-        <p>Your Profile</p>
+        <p className="text-black text-base font-normal" onClick={()=>navigate('/myprofile')}>Your Profile</p>
       )
     },
     {
@@ -82,7 +82,7 @@ const Home = () => {
 
   return (
     <div>
-      <header className="w-full  px-3 py-2 bg-blue-400 text-white flex justify-between">
+      <header className="w-full  px-3 py-2 bg-gray-600 text-white flex justify-between">
         <div className="text-[36px] font-poppins">Chat App</div>
         <div className="cursor-pointer flex gap-6 items-center">
           <IoSearchOutline className="text-2xl" onClick={showModal} />

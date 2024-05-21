@@ -163,7 +163,7 @@ const Conversation = () => {
   }
   return (
     <div className="w-screen h-screen flex flex-col justify-between">
-      <header className="w-full  px-3 py-2 bg-blue-400 text-white flex items-center gap-7">
+      <header className="w-full  px-3 py-2 bg-gray-600 text-white flex items-center gap-7">
         <Link to="/" className="cursor-pointer">
           <FaChevronCircleLeft className="text-[42px]" />
         </Link>
