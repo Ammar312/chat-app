@@ -14,7 +14,6 @@ const Home = () => {
   const currentUserId = state.user._id;
   const searchRef = useRef();
   const navigate = useNavigate();
-
   const logoutHandle = async () => {
     try {
       const response = await axios.post(
@@ -36,7 +35,7 @@ const Home = () => {
   const items = [
     {
       label:(
-        <p className="text-black text-base font-normal" onClick={()=>navigate('/myprofile')}>Your Profile</p>
+        <p className="text-black text-base font-semibold" onClick={()=>navigate('/myprofile')}>Your Profile</p>
       )
     },
     {

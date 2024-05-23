@@ -54,7 +54,6 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path={`conversation`} element={<Conversation />} />
           <Route path={`myprofile`} element={<Profile />} />
-          {/* <Route path="conversation" element={<Conversation />} /> */}
           <Route path="*" element={<Navigate to="/" replace={true} />} />
         </Routes>
       ) : null}

@@ -8,6 +8,8 @@ import { FaChevronCircleLeft, FaChevronRight } from "react-icons/fa";
 import { GlobalContext } from "../context/context";
 import { Bars } from "react-loader-spinner";
 import { TiTick } from "react-icons/ti";
+import { IoMdCall } from "react-icons/io";
+import { BiVideo } from "react-icons/bi";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 const Conversation = () => {
@@ -163,7 +165,8 @@ const Conversation = () => {
   }
   return (
     <div className="w-screen h-screen flex flex-col justify-between">
-      <header className="w-full  px-3 py-2 bg-gray-600 text-white flex items-center gap-7">
+      <header className="w-full  px-3 py-2 bg-gray-600 text-white flex items-center justify-between gap-7">
+        <div className="flex gap-2">
         <Link to="/" className="cursor-pointer">
           <FaChevronCircleLeft className="text-[42px]" />
         </Link>
@@ -173,6 +176,11 @@ const Conversation = () => {
           </span>
           <span>{isOnline ? "Online" : ""}</span>
         </p>
+        </div>
+        <div className="flex gap-5">
+          <span className="text-2xl cursor-pointer"><IoMdCall /></span>
+          <span className="text-2xl cursor-pointer"><BiVideo /></span>
+        </div>
       </header>
       <div className="p-4 flex-1 flex flex-col  gap-2 w-full h-full overflow-y-auto bg-gray-300">
         {messages?.map((message, index) => {

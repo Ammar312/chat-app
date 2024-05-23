@@ -16,7 +16,7 @@ export const updateAvatar = async (req, res) => {
             responseFunc(res, 403, "Limit Exceed")
             return;
         }
-        const avatar = await uploadCloudinary(buffer);
+        const avatar = await uploadCloudinary(file.path);
         console.log("avatar ", avatar);
         const result = await USER.updateOne(
             { _id },

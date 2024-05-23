@@ -139,6 +139,8 @@ export const getProfile = async (req, res) => {
       username: result.username,
       email: result.email,
       _id: result._id,
+      imgUrl:result.imgUrl,
+      imgPublicId:result.imgPublicId
     });
   } catch (error) {
     console.log("profileFetchedError", error);
