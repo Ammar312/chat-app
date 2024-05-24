@@ -1,9 +1,8 @@
 import axios from "axios";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
 import { Link, useParams, useLocation } from "react-router-dom";
 import dayjs from "dayjs";
-import { baseURL } from "../core";
+import { baseURL,socket } from "../core";
 import { FaChevronCircleLeft, FaChevronRight } from "react-icons/fa";
 import { GlobalContext } from "../context/context";
 import { Bars } from "react-loader-spinner";
@@ -44,7 +43,7 @@ const Conversation = () => {
   }, [conversationId]);
 
   useEffect(() => {
-    const socket = io("http://localhost:3000");
+    // const socket = io("http://localhost:3000");
     socket.on("connect", () => {
       console.log("Connected");
       console.log("subscribed:", `${currentUserId}-${recipient?._id}`);
